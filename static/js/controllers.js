@@ -26,63 +26,6 @@ photogallery.config(['$routeProvider',
       });
   }]); 
 
-photogallery.directive('slider', function($timeout, $document) {
-  return {
-    restrict: 'AE',
-    replace: true,
-    scope: {
-      imagespromise: '=',
-      currentIndex: '='
-    },
-    link: function(scope, elem, attrs) {
-		// scope.currentIndex = 0; // Initially the index is at the first image
-		 
-		scope.next = function() {
-		  scope.currentIndex < scope.images.length - 1 ? scope.currentIndex++ : scope.currentIndex = 0;
-		};
-		 
-		scope.prev = function() {
-		  scope.currentIndex > 0 ? scope.currentIndex-- : scope.currentIndex = scope.images.length - 1;
-		};    	
-
-		scope.$watch('currentIndex', function() {
-		  scope.imagespromise.then(function(images) {
-		  	images.forEach(function(image) {
-		    	image.visible = false; // make every image invisible
-		  	});
-		  	images[scope.currentIndex].visible = true; // make the current image visible
-		  	scope.images = images;
-		  });		 
-		});
-
-		// var timer;
-		// var sliderFunc = function() {
-		//   timer = $timeout(function() {
-		//     scope.next();
-		//     timer = $timeout(sliderFunc, 5000);
-		//   }, 5000);
-		// };
-		 
-		// sliderFunc();
-		 
-		// scope.$on('$destroy', function() {
-		//   $timeout.cancel(timer); // when the scope is getting destroyed, cancel the timer
-		// });
-
-		$document.bind("keydown", function (event) {
-            if(event.which === 37 || event.which === 38) {
-                scope.prev();
-                scope.$digest()
-            }
-            if(event.which === 39 || event.which === 40) {
-                scope.next();
-                scope.$digest()
-            }
-        });
-    },
-    templateUrl: 'partials/slider.html'
-  };
-});
 
 photogallery.factory('photodb', ['$http', '$q', function($http, $q, $scope) {
 	return {
@@ -123,6 +66,65 @@ photogallery.factory('photodb', ['$http', '$q', function($http, $q, $scope) {
 		}
 	}
 }]);
+
+photogallery.directive('slider', function($timeout, $document) {
+  return {
+    restrict: 'AE',
+    replace: true,
+    scope: {
+      imagespromise: '=',
+      currentIndex: '='
+    },
+    link: function(scope, elem, attrs) {
+		scope.images = [];
+		 
+		scope.next = function() {
+		  scope.currentIndex < scope.numImages - 1 ? scope.currentIndex++ : scope.currentIndex = 0;
+		};
+		 
+		scope.prev = function() {
+		  scope.currentIndex > 0 ? scope.currentIndex-- : scope.currentIndex = scope.numImages - 1;
+		};    	
+
+		scope.$watch('currentIndex', function() {
+		  scope.imagespromise.then(function(images) {
+		  	for (i = 0; i < 5; i++) {
+			  	scope.images[i] = images[(scope.currentIndex + i - 2 + images.length) % images.length];
+			  	scope.images[i].visible = false;
+		  	}
+		  	scope.images[2].visible = true;
+		  	scope.numImages = images.length;
+		  });		 
+		});
+
+		// var timer;
+		// var sliderFunc = function() {
+		//   timer = $timeout(function() {
+		//     scope.next();
+		//     timer = $timeout(sliderFunc, 5000);
+		//   }, 5000);
+		// };
+		 
+		// sliderFunc();
+		 
+		// scope.$on('$destroy', function() {
+		//   $timeout.cancel(timer); // when the scope is getting destroyed, cancel the timer
+		// });
+
+		$document.bind("keydown", function (event) {
+            if(event.which === 37 || event.which === 38) {
+                scope.prev();
+                scope.$digest()
+            }
+            if(event.which === 39 || event.which === 40) {
+                scope.next();
+                scope.$digest()
+            }
+        });
+    },
+    templateUrl: 'partials/slider.html'
+  };
+});
 
 photogallery.controller('GalleryCtrl', ['$scope', 'photodb', '$routeParams', function ($scope, photodb, $routeParams) {
   photodb.photos($routeParams.galleryId).then(function(result) { $scope.images = result; });
