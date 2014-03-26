@@ -21,7 +21,8 @@ class PhotoDB:
         galleries = self.load_gallery(gallery_id)
         if galleries:
             gallery = galleries[0]
-            return os.path.join(gallery['images_dir'], filename)
+            return os.path.join(
+                gallery['root_dir'], gallery['images_dir'], filename)
         else:
             return 'file-not-found'
 
@@ -54,7 +55,7 @@ class PhotoDB:
             'tags': tags,
             'uuid': uuid.uuid1().hex
         }
-        for filename in os.listdir(gallery_dir):
+        for filename in os.listdir(os.path.join(root_dir, gallery_dir)):
             ext = os.path.splitext(filename)[1]
             if ext.lower() in ['.jpg', '.jpeg', '.gif', '.png']:
                 gallery['photos'].append({
@@ -78,6 +79,9 @@ class PhotoDB:
             'galleryId': gallery['uuid'],
             'name': gallery['title'],        
         } for gallery in self.db.table('gallery').all()]
+
+    def galleries(self):
+        return self.db.table('gallery').all()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
