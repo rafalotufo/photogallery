@@ -1,5 +1,13 @@
 <ul class="gallery">
-  <li ng-repeat="gallery in gallery_list" class="thumbnail">
-    <a href="#/gallery/{{gallery.galleryId}}">{{gallery.name}}</a>
+  <li ng-repeat="gallery in gallery_list" class="mythumbnail">
+	<a href="#/gallery/{{gallery.galleryId}}">
+  		<img ng-src="{{gallery.thumbnail}}" align="middle"/>
+  		<ul class="tags">
+  			<li ng-repeat="tag in gallery.tags">
+  				<div class="label label-primary">{{tag}}</div>
+  			</li>
+		</ul>
+    	<div class="title"><span class="spacer"></span>{{gallery.name}}<span class="spacer"></span></div>
+    </a>
   </li>
 </ul>

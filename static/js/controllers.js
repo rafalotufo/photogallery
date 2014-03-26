@@ -109,6 +109,13 @@ photogallery.factory('photodb', ['$http', '$q', function($http, $q, $scope) {
 
 			$http.get("/galleries", {})
 			.then(function(data, status, headers, config) {
+				var galleries = data.data
+				if (galleries.map) {
+					galleries = galleries.map(function(gallery) {
+						gallery.thumbnail = '/thumbnails/' + gallery.thumbnail;
+						return gallery;
+					})
+				}
 			    deferred.resolve(data.data);
 			});
 

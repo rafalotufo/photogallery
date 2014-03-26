@@ -77,7 +77,9 @@ class PhotoDB:
     def list_galleries(self):
         return [{
             'galleryId': gallery['uuid'],
-            'name': gallery['title'],        
+            'name': gallery['title'],
+            'thumbnail': os.path.join('/', gallery['uuid'], gallery['photos'][0]['path']),
+            'tags': gallery['tags']
         } for gallery in self.db.table('gallery').all()]
 
     def galleries(self):

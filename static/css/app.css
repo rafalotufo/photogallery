@@ -32,14 +32,15 @@ h1 {
   color: #222;
 }
 
-.thumbnail {
-	width: 227px;
-	height: 200px;
+.mythumbnail {
+	/*width: 227px;*/
+	/*height: 170px;*/
+	margin: 10px;
 }
 
-.thumbnail img {
+.mythumbnail img {
 	max-width: 227px;
-	max-height: 150px;
+	/*max-height: 150px;*/
 	display: block;
     margin-left: auto;
     margin-right: auto;
@@ -49,11 +50,33 @@ h1 {
 	list-style-type: none;
 }
 
-.gallery .thumbnail {
+.gallery .mythumbnail {
 	float: left;
+	position: relative;
 }
 
-.gallery .thumbnail .zoom {
+.gallery .mythumbnail .title {
+   position: absolute; 
+   bottom: 0px; 
+   left: 0; 
+   width: 100%; 
+   background-color: black;
+   color: white;
+   padding: 3px 0 3px 0px;
+}
+
+.tags {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	list-style-type: none;
+}
+
+.title .spacer {
+   padding:0 5px;
+}
+
+.gallery .mythumbnail .zoom {
 	width: 800px;
 }
 
