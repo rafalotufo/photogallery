@@ -55,6 +55,6 @@ if __name__ == '__main__':
 
     gallery_list = map(lambda f: f.strip(), open(args.gallery_list).readlines())
     db = photodb.PhotoDB(args.db_file)    
-#    for gallery_dir in gallery_list:
-#        import_gallery_from_disk(db, args.root_dir, gallery_dir, args.root_thumbnails_dir)
-    create_thumbnails(db)
+    for gallery_dir in gallery_list:
+       import_gallery_from_disk(db, args.root_dir, gallery_dir, args.root_thumbnails_dir)
+    # create_thumbnails(db)

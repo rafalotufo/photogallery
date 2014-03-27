@@ -57,7 +57,7 @@ class PhotoDB:
         }
         for filename in os.listdir(os.path.join(root_dir, gallery_dir)):
             ext = os.path.splitext(filename)[1]
-            if ext.lower() in ['.jpg', '.jpeg', '.gif', '.png']:
+            if ext.lower() in ['.jpg', '.jpeg', '.gif', '.png', '.mov', 'mp4']:
                 gallery['photos'].append({
                     'path': filename.replace(gallery_dir, '')
                 })

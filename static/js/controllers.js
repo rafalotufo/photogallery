@@ -67,7 +67,7 @@ photogallery.factory('photodb', ['$http', '$q', function($http, $q, $scope) {
 	}
 }]);
 
-photogallery.directive('slider', function($timeout, $document) {
+photogallery.directive('slider', function($timeout, $document, $location) {
   return {
     restrict: 'AE',
     replace: true,
@@ -77,6 +77,7 @@ photogallery.directive('slider', function($timeout, $document) {
     },
     link: function(scope, elem, attrs) {
 		scope.images = [];
+		scope.currentIndex = parseInt(scope.currentIndex);
 		 
 		scope.next = function() {
 		  scope.currentIndex < scope.numImages - 1 ? scope.currentIndex++ : scope.currentIndex = 0;

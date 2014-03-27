@@ -17,6 +17,15 @@ class galleries:
 
 class photos:
     def GET(self):
+        def media_ext(path):
+            return os.path.splitext(path)[1].lower().strip('.')
+        def media_type(path):
+            ext = media_ext(path)
+            if ext in ['jpg', 'jpeg', 'gif', 'png']:
+                return 'image'
+            if ext in ['mov', 'mp4', 'ogg']:
+                return 'video'
+
         gallery_id = web.input()['gallery-id']
         web.header('Content-Type', 'application/json')
         gallery = web.db.load_gallery(gallery_id)
@@ -24,6 +33,8 @@ class photos:
             photos = list({
                 'name': 'sasf', 
                 'path': os.path.join('/', gallery_id, photo['path']),
+                'type': media_type(photo['path']),
+                'ext': media_ext(photo['path']),
                 'index': i
             } for i,photo in enumerate(gallery[0]['photos']))
             return json.dumps(photos)
