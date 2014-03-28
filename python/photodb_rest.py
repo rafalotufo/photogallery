@@ -3,6 +3,7 @@ import json
 import photodb
 import os
 import sys
+import image_processing
 
 urls = (
     '/galleries', 'galleries',
@@ -51,11 +52,19 @@ class images:
         }
 
         path = web.db.image_path(name)
-        if True or name in os.listdir('images'):  # Security
-            # web.header("Content-Type", cType[ext]) # Set the Header
-            return open(path,"rb").read() # Notice 'rb' for reading images
-        else:
-            raise web.notfound()
+        # web.header("Content-Type", cType[ext]) # Set the Header
+        f = None
+        try:
+            f = open(path['src'], 'rb') # Notice 'rb' for reading images
+        except IOError:
+            image_processing.resize_image(
+                path['original'], path['src'], 1024, 780, mkdir=True)
+            f = open(path['src'], 'rb') # Notice 'rb' for reading images
+        finally:
+            if f:
+                return f.read()
+            else:
+                raise web.notfound()
 
 class thumbnails:
     def GET(self,name):
@@ -69,10 +78,11 @@ class thumbnails:
         }
 
         path = web.db.thumbnail_image_path(name)
+        print path
         # if True or name in os.listdir('images'):  # Security
         try:
             # web.header("Content-Type", cType[ext]) # Set the Header
-            return open(path,"rb").read() # Notice 'rb' for reading images
+            return open(path, 'rb').read() # Notice 'rb' for reading images
         except:
             raise web.seeother('/static/img/loading.gif')
 

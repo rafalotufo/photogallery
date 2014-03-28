@@ -1,8 +1,6 @@
 import os
 import argparse
 import photodb
-import pykka
-import image_processing
 
 def import_gallery_from_disk(db, root_dir, gallery_dir, root_thumbnails_dir):
     path, gallery_folder = os.path.split(gallery_dir)
@@ -25,26 +23,6 @@ def import_gallery_from_disk(db, root_dir, gallery_dir, root_thumbnails_dir):
         tags)
     print 'Created gallery %s' % gallery['title']
 
-def create_thumbnails(db):
-    for gallery in db.galleries():
-        for photo in gallery['photos']:
-#        ThumbnailCreator.start().proxy().create_thumbnail(
-            create_thumbnail(
-                os.path.join(gallery['root_dir'], gallery['images_dir'], photo['path']),
-                os.path.join(gallery['thumbnails_dir'], photo['path']),
-                277, 200)
-
-#class ThumbnailCreator(pykka.ThreadingActor):
-def create_thumbnail(image_path, target_image, width, height):
-    print image_path, target_image
-    try:
-        image_processing.create_thumbnail(
-            image_path, target_image, width, height, mkdir=True)
-    except Exception as e:
-        print e
-#    finally:
-#        self.stop()
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('gallery_list')
@@ -57,4 +35,3 @@ if __name__ == '__main__':
     db = photodb.PhotoDB(args.db_file)    
     for gallery_dir in gallery_list:
        import_gallery_from_disk(db, args.root_dir, gallery_dir, args.root_thumbnails_dir)
-    # create_thumbnails(db)

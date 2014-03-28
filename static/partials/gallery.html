@@ -1,6 +1,6 @@
-<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat="photo in images">
-    <a href="#/gallery-zoom/{{galleryId}}/{{photo.index}}" class="thumbnail">
-    	<img ng-src="{{photo.thumbnail}}" align="middle" zoomable/>
+<div ng-switch on="photo.type" class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat="photo in images">
+    <a ng-switch-when="image" href="#/gallery-zoom/{{galleryId}}/{{photo.index}}" class="thumbnail">
+    		<img ng-src="{{photo.thumbnail}}" align="middle" zoomable/>
     </a>
 </div>
 

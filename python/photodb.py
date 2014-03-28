@@ -21,8 +21,11 @@ class PhotoDB:
         galleries = self.load_gallery(gallery_id)
         if galleries:
             gallery = galleries[0]
-            return os.path.join(
-                gallery['root_dir'], gallery['images_dir'], filename)
+            return {
+                'src': os.path.join(
+                    gallery['root_dir'], gallery['thumbnails_dir'], 'large', filename),
+                'original': os.path.join(gallery['root_dir'], gallery['gallery_dir'], filename)
+            }
         else:
             return 'file-not-found'
 
@@ -32,7 +35,7 @@ class PhotoDB:
         galleries = self.load_gallery(gallery_id)
         if galleries:
             gallery = galleries[0]
-            return os.path.join(gallery['thumbnails_dir'], filename)
+            return os.path.join(gallery['thumbnails_dir'], 'small', filename)
         else:
             return 'file-not-found'
 
@@ -49,7 +52,7 @@ class PhotoDB:
         gallery = {
             'title': title,
             'root_dir': root_dir,
-            'images_dir': gallery_dir,
+            'gallery_dir': gallery_dir,
             'thumbnails_dir': thumbnails_dir,
             'photos': [],
             'tags': tags,

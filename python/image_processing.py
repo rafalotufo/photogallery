@@ -19,8 +19,13 @@ def create_thumbnail(source_image, target_image, width, height, mkdir=False):
             print e
             print "cannot create copy for '%s'" % source_image
 
-def resize_image(source_image, target_image, width, height):
+def resize_image(source_image, target_image, width, height, mkdir=False):
     if source_image != target_image:
+        if mkdir:
+            try:
+                os.makedirs(os.path.dirname(target_image))
+            except:
+                pass
         try:
             img = Image.open(source_image)
             wpercent = (width/float(img.size[0]))
