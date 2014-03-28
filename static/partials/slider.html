@@ -1,7 +1,7 @@
 <div class="slider">
   <div class="slide" ng-repeat="image in images" ng-show="image.visible">
     <div ng-switch on="image.type">
-      <img ng-switch-when="image" ng-src="{{image.src}}" class="img-responsive" />
+      <img ng-switch-when="image" ng-src="{{image.src}}" class="img-fit center-block" />
 <!--       <video ng-switch-when="video" width="320" height="240" controls>
         <source src="{{image.src}}" type="video/mp4">
         Your browser does not support the video tag.
