@@ -78,10 +78,14 @@ class PhotoDB:
             self.db.table('gallery').search(where('uuid') == gallery_id))
 
     def list_galleries(self):
+        def is_image(filename): 
+            ext = os.path.splitext(filename)[1]
+            return ext.lower() in ['.jpg', '.jpeg', '.gif', '.png']
+        first_image = next(x for x in gallery['photos'] if is_image(x['path']))
         return [{
             'galleryId': gallery['uuid'],
             'name': gallery['title'],
-            'thumbnail': os.path.join('/', gallery['uuid'], gallery['photos'][0]['path']),
+            'thumbnail': os.path.join('/', gallery['uuid'], first_image['path']),
             'tags': gallery['tags']
         } for gallery in self.db.table('gallery').all()]
 
