@@ -3,9 +3,9 @@ import argparse
 import photodb
 
 def import_gallery_from_disk(db, root_dir, gallery_dir, root_thumbnails_dir):
+    gallery_dir = gallery_dir.replace(root_dir, '')
     path, gallery_folder = os.path.split(gallery_dir)
     title = gallery_folder
-    gallery_dir = gallery_dir.replace(root_dir, '')
     def split_names(path):
         head, tail = os.path.split(path)
         if head and tail:
