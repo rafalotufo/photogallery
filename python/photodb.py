@@ -81,11 +81,12 @@ class PhotoDB:
         def is_image(filename): 
             ext = os.path.splitext(filename)[1]
             return ext.lower() in ['.jpg', '.jpeg', '.gif', '.png']
-        first_image = next(x for x in gallery['photos'] if is_image(x['path']))
+        def first_image(gallery):
+            return next(x for x in gallery['photos'] if is_image(x['path']))
         return [{
             'galleryId': gallery['uuid'],
             'name': gallery['title'],
-            'thumbnail': os.path.join('/', gallery['uuid'], first_image['path']),
+            'thumbnail': os.path.join('/', gallery['uuid'], first_image(gallery)['path']),
             'tags': gallery['tags']
         } for gallery in self.db.table('gallery').all()]
 
