@@ -33,52 +33,26 @@ h1 {
   color: #222;
 }
 
-.mythumbnail {
-	/*width: 227px;*/
-	/*height: 170px;*/
-	margin: 10px;
-}
-
-.mythumbnail img {
-	max-width: 227px;
-	/*max-height: 150px;*/
-	display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .gallery {
 	list-style-type: none;
 }
 
-.gallery .mythumbnail {
+.thumbnail {
 	float: left;
 	position: relative;
 }
 
-.gallery .mythumbnail .title {
+.gallery-name {
    position: absolute; 
-   bottom: 0px; 
-   left: 0; 
-   width: 100%; 
-   background-color: black;
-   color: white;
-   padding: 3px 0 3px 0px;
+   bottom: 10px; 
+   left: 10px;   
 }
 
 .tags {
 	position: absolute;
-	right: 0px;
-	top: 0px;
+	right: 10px;
+	top: 5px;
 	list-style-type: none;
-}
-
-.title .spacer {
-   padding:0 5px;
-}
-
-.gallery .mythumbnail .zoom {
-	width: 800px;
 }
 
 /* slider */
