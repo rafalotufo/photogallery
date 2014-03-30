@@ -7,41 +7,46 @@ import image_processing
 
 urls = (
     '/galleries', 'galleries',
-    '/photos', 'photos',
-    '/images/(.*)', 'images',
-    '/thumbnails/(.*)', 'thumbnails',
+    '/galleries/(.*)/photos/(.*)', 'images',
+    '/galleries/(.*)/thumbnails/(.*)', 'thumbnails',
+    '/galleries/(.*)', 'galleries'
 )
 
+def media_ext(path):
+    return os.path.splitext(path)[1].lower().strip('.')
+def media_type(path):
+    ext = media_ext(path)
+    if ext in ['jpg', 'jpeg', 'gif', 'png']:
+        return 'image'
+    if ext in ['mov', 'mp4', 'ogg']:
+        return 'video'
+
 class galleries:
-    def GET(self):
-        return json.dumps(web.db.list_galleries())
-
-class photos:
-    def GET(self):
-        def media_ext(path):
-            return os.path.splitext(path)[1].lower().strip('.')
-        def media_type(path):
-            ext = media_ext(path)
-            if ext in ['jpg', 'jpeg', 'gif', 'png']:
-                return 'image'
-            if ext in ['mov', 'mp4', 'ogg']:
-                return 'video'
-
-        gallery_id = web.input()['gallery-id']
-        web.header('Content-Type', 'application/json')
-        gallery = web.db.load_gallery(gallery_id)
-        if gallery:
-            photos = list({
-                'name': 'sasf', 
-                'path': os.path.join('/', gallery_id, photo['path']),
-                'type': media_type(photo['path']),
-                'ext': media_ext(photo['path']),
-                'index': i
-            } for i,photo in enumerate(gallery[0]['photos']))
-            return json.dumps(photos)
+    def GET(self, gallery_id=None):
+        if gallery_id is None:
+            return json.dumps(web.db.list_galleries())
+        else:
+            # gallery_id = web.input()['gallery-id']
+            web.header('Content-Type', 'application/json')
+            gallery = web.db.load_gallery(gallery_id)
+            if gallery:
+                photos = list({
+                    'name': photo['path'], 
+                    'gallery_id': gallery_id,
+                    'path': photo['path'],
+                    'type': media_type(photo['path']),
+                    'ext': media_ext(photo['path']),
+                    'index': i,
+                    'favorite': photo.get('favorite', False)
+                } for i,photo in enumerate(gallery['photos']))
+                return json.dumps(photos)
 
 class images:
-    def GET(self,name):
+    def POST(self, gallery_id, name):
+        data = json.loads(web.data())
+        web.db.update_image_metadata(gallery_id, name, data)
+
+    def GET(self, gallery_id, name):
         ext = name.split(".")[-1].lower() # Gather extension
 
         cType = {
@@ -51,7 +56,7 @@ class images:
             "ico":"images/x-icon"            
         }
 
-        path = web.db.image_path(name)
+        path = web.db.image_path(gallery_id, name)
         # web.header("Content-Type", cType[ext]) # Set the Header
         f = None
         try:
@@ -67,7 +72,8 @@ class images:
                 raise web.notfound()
 
 class thumbnails:
-    def GET(self,name):
+    def GET(self, gallery_id, name):
+        print 'here'
         ext = name.split(".")[-1].lower() # Gather extension
 
         cType = {
@@ -77,7 +83,7 @@ class thumbnails:
             "ico":"images/x-icon"            
         }
 
-        path = web.db.thumbnail_image_path(name)
+        path = web.db.thumbnail_image_path(gallery_id, name)
         print path
         # if True or name in os.listdir('images'):  # Security
         try:

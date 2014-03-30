@@ -15,12 +15,10 @@ class PhotoDB:
         self.db = TinyDB(db_file_path, storage=self.concurrentMiddleware)
         self.gallery_cache = {}
 
-    def image_path(self, image_id):
-        gallery_id, filename = os.path.split(image_id)
-        gallery_id = gallery_id.strip('/')
+    def image_path(self, gallery_id, filename):
         galleries = self.load_gallery(gallery_id)
         if galleries:
-            gallery = galleries[0]
+            gallery = galleries
             return {
                 'src': os.path.join(
                     gallery['root_dir'], gallery['thumbnails_dir'], 'large', filename),
@@ -29,12 +27,10 @@ class PhotoDB:
         else:
             return 'file-not-found'
 
-    def thumbnail_image_path(self, image_id):
-        gallery_id, filename = os.path.split(image_id)
-        gallery_id = gallery_id.strip('/')
+    def thumbnail_image_path(self, gallery_id, filename):
         galleries = self.load_gallery(gallery_id)
         if galleries:
-            gallery = galleries[0]
+            gallery = galleries
             return os.path.join(gallery['thumbnails_dir'], 'small', filename)
         else:
             return 'file-not-found'
@@ -61,8 +57,9 @@ class PhotoDB:
         for filename in os.listdir(os.path.join(root_dir, gallery_dir)):
             ext = os.path.splitext(filename)[1]
             if ext.lower() in ['.jpg', '.jpeg', '.gif', '.png', '.mov', 'mp4']:
+                path = filename.replace(gallery_dir, '')
                 gallery['photos'].append({
-                    'path': filename.replace(gallery_dir, '')
+                    'path': path
                 })
         self.db.table('gallery').insert(gallery)
         self.gallery_cache[gallery['uuid']] = gallery
@@ -72,10 +69,27 @@ class PhotoDB:
 #     db.table('gallery').remove(where('uuid') == gallery_id)
 #     add_gallery(db, gallery_dir, title, tags)
 
+    def update_image_metadata(self, gallery_id, name, data):
+        gallery = self.load_gallery(gallery_id)
+        for i,item in enumerate(gallery['photos']):
+            if item['path'] == name:
+                break
+        image = gallery['photos'][i]
+        for name, val in data.iteritems():
+            image[name] = val
+        gallery['photos'][i] = image
+        self.db.table('gallery').remove(where('uuid') == gallery_id)
+        self.db.table('gallery').insert(gallery)
+        self.gallery_cache[gallery['uuid']] = gallery
+
     def load_gallery(self, gallery_id):
-        return self.gallery_cache.setdefault(
-            gallery_id,
-            self.db.table('gallery').search(where('uuid') == gallery_id))
+        if gallery_id not in self.gallery_cache:
+            galleries = self.db.table('gallery').search(where('uuid') == gallery_id)
+            if galleries:
+                self.gallery_cache[gallery_id] = galleries[0]
+            else:
+                return None
+        return self.gallery_cache[gallery_id]
 
     def list_galleries(self):
         def is_image(filename): 
@@ -84,9 +98,9 @@ class PhotoDB:
         def first_image(gallery):
             return next(x for x in gallery['photos'] if is_image(x['path']))
         return [{
-            'galleryId': gallery['uuid'],
+            'gallery_id': gallery['uuid'],
             'name': gallery['title'],
-            'thumbnail': os.path.join('/', gallery['uuid'], first_image(gallery)['path']),
+            'thumbnail': first_image(gallery)['path'],
             'tags': gallery['tags']
         } for gallery in self.db.table('gallery').all()]
 

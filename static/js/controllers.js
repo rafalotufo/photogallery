@@ -32,16 +32,9 @@ photogallery.factory('photodb', ['$http', '$q', function($http, $q, $scope) {
 		photos: function(galleryId) {
 			var deferred = $q.defer();
 
-			$http.get("/photos?gallery-id=" + galleryId, {})
+			$http.get("/galleries/" + galleryId, {})
 			.then(function(data, status, headers, config) {
 				var images = data.data;
-				if (images.map) {
-					images = images.map(function(image) {
-						image.src = '/images/' + image.path;
-						image.thumbnail = '/thumbnails/' + image.path;
-						return image;
-					});
-				}
 			    deferred.resolve(images);
 			});
 
@@ -53,18 +46,64 @@ photogallery.factory('photodb', ['$http', '$q', function($http, $q, $scope) {
 			$http.get("/galleries", {})
 			.then(function(data, status, headers, config) {
 				var galleries = data.data
-				if (galleries.map) {
-					galleries = galleries.map(function(gallery) {
-						gallery.thumbnail = '/thumbnails/' + gallery.thumbnail;
-						return gallery;
-					})
-				}
 			    deferred.resolve(data.data);
 			});
 
 			return deferred.promise;
+		},
+		setFavorite: function(galleryId, imagePath, favorite) {
+			$http.post("/galleries/" + galleryId + "/photos/" + imagePath, {
+				favorite: favorite
+			});
 		}
 	}
+}]);
+
+photogallery.directive('favorite', ['photodb', function(photodb) {
+	return {
+		restrict: 'AE',
+		replace: true,
+		template: '<div style="width: 30px;"></div>',
+		scope: {
+			image: '='
+		},
+		link: function(scope, elem, attrs, controllerInstance) {
+			var setFavoriteClass = function(isFavorite) {
+				if (isFavorite) {
+					elem.removeClass('favorite-hover');
+					elem.addClass('favorite');
+					elem.removeClass('non-favorite');
+				}
+				else {
+					elem.removeClass('favorite-hover');
+					elem.addClass('non-favorite');
+					elem.removeClass('favorite');
+				}				
+			}
+
+			scope.image.favorite = scope.image.favorite || false;
+			setFavoriteClass(scope.image.favorite);
+
+			elem.bind('click', function() {
+				// scope.imagespromise.then(function(images) {
+				// 	var image = images[scope.currentIndex];
+				// 	scope.isFavorite = !scope.isFavorite;
+				// 	photodb.setFavorite(image.gallery_id, image.path, scope.isFavorite);
+				// })
+				scope.image.favorite = ! scope.image.favorite;
+				photodb.setFavorite(scope.image.gallery_id, scope.image.path, scope.image.favorite);
+				setFavoriteClass(scope.image.favorite);
+			});
+
+			elem.bind('mouseover', function() {
+				elem.addClass('favorite-hover');
+			});
+
+			elem.bind('mouseout', function() {
+				elem.removeClass('favorite-hover');
+			});
+		}
+	};
 }]);
 
 photogallery.directive('slider', function($timeout, $document, $location) {
@@ -73,7 +112,8 @@ photogallery.directive('slider', function($timeout, $document, $location) {
     replace: true,
     scope: {
       imagespromise: '=',
-      currentIndex: '='
+      currentIndex: '=',
+      isFavorite: '='
     },
     link: function(scope, elem, attrs) {
 		scope.images = [];
@@ -127,6 +167,12 @@ photogallery.directive('slider', function($timeout, $document, $location) {
   };
 });
 
+photogallery.controller('GalleryListCtrl', ['$scope', 'photodb', function ($scope, photodb) {
+  photodb.galleries().then(function(gallery_list) { 
+  	$scope.gallery_list = gallery_list; 
+  });
+}]);
+
 photogallery.controller('GalleryCtrl', ['$scope', 'photodb', '$routeParams', function ($scope, photodb, $routeParams) {
   photodb.photos($routeParams.galleryId).then(function(result) { $scope.images = result; });
   $scope.galleryId = encodeURIComponent(encodeURIComponent($routeParams.galleryId));
@@ -135,19 +181,7 @@ photogallery.controller('GalleryCtrl', ['$scope', 'photodb', '$routeParams', fun
 photogallery.controller('GalleryZoomCtrl', ['$scope', 'photodb', '$routeParams', function ($scope, photodb, $routeParams) {
   $scope.images_promise = photodb.photos($routeParams.galleryId);
   $scope.selected_image = $routeParams.selectedIndex;
-  $scope.galleryId = $routeParams.galleryId;
+  $scope.gallery_id = $routeParams.galleryId;
 }]);
 
 
-photogallery.controller('GalleryListCtrl', ['$scope', 'photodb', function ($scope, photodb) {
-  photodb.galleries().then(function(result) { 
-  	$scope.gallery_list = result.map(function(gallery) {
-  		gallery.galleryId = gallery.galleryId;
-  		return gallery;
-  	}); 
-  });
-
-  // $scope.gallery_list = [
-  // 	{name: 'foo', gallery_dir: encodeURIComponent(encodeURIComponent('static/2013/fotos-erika'))}
-  // ];
-}]);

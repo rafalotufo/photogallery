@@ -1,6 +1,6 @@
   <div ng-repeat="gallery in gallery_list" class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
-	   <a href="#/gallery/{{gallery.galleryId}}" class="thumbnail">
-  		<img ng-src="{{gallery.thumbnail}}" align="middle"/>
+	   <a href="#/gallery/{{gallery.gallery_id}}" class="thumbnail">
+  		<img ng-src="/galleries/{{gallery.gallery_id}}/thumbnails/{{gallery.thumbnail}}" align="middle"/>
   		<ul class="tags">
   			<li ng-repeat="tag in gallery.tags">
   				<div class="label label-primary">{{tag}}</div>

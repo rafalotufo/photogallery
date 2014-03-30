@@ -31,9 +31,23 @@
   right: 0;
 }
 
-.slide img {
+.slide .img-fit {
   box-shadow: 0px 0px 15px #999;
 }
+
+.favorite {
+  content:url(/static/img/star_full.png);
+}
+
+.non-favorite {
+  content:url(/static/img/star_empty.png);
+}
+
+.favorite-hover {
+  content:url(/static/img/star_half.png);
+  /*opacity: 0.2;*/
+}
+
 
 /*.slide img {
   box-shadow: 0px 0px 15px #999;
@@ -43,9 +57,13 @@
   position: absolute;
   top: 10px;
   right: 20px;
+  width: 100px;
 }
 .arrows img {
   height: 32px;
+}
+.arrows * {
+  float: left;
 }
 h1 {
   text-align: center;
