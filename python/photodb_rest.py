@@ -90,7 +90,7 @@ class thumbnails:
             # web.header("Content-Type", cType[ext]) # Set the Header
             return open(path, 'rb').read() # Notice 'rb' for reading images
         except:
-            raise web.seeother('/static/img/loading.gif')
+            raise web.notfound()
 
 
 if __name__ == "__main__":
