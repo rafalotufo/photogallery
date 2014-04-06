@@ -1,4 +1,4 @@
-var photogallery = angular.module('photogallery', ['ngRoute', 'ngAnimate']);
+var photogallery = angular.module('photogallery', ['ngRoute', 'ngAnimate', 'infinite-scroll']);
 
 /**
  * Todo:
@@ -168,14 +168,39 @@ photogallery.directive('slider', function($timeout, $document, $location) {
 });
 
 photogallery.controller('GalleryListCtrl', ['$scope', 'photodb', function ($scope, photodb) {
-  photodb.galleries().then(function(gallery_list) { 
-  	$scope.gallery_list = gallery_list; 
-  });
+    var galleriesPromise = photodb.galleries();
+    var n = 8;
+    var firstBatchLoaded = galleriesPromise.then(function(allGalleries) {
+        $scope.gallery_list = allGalleries.slice(0, n);
+        return allGalleries;
+    });
+    $scope.loadMore = function() {
+        firstBatchLoaded.then(function(allGalleries) { 
+            var last = $scope.gallery_list.length;
+            for(var i = 0; i < n && last + i < allGalleries.length; i++) {
+              $scope.gallery_list.push(allGalleries[last + i]);
+            }
+        })
+    };
 }]);
 
 photogallery.controller('GalleryCtrl', ['$scope', 'photodb', '$routeParams', function ($scope, photodb, $routeParams) {
-  photodb.photos($routeParams.galleryId).then(function(result) { $scope.images = result; });
-  $scope.galleryId = encodeURIComponent(encodeURIComponent($routeParams.galleryId));
+    var galleryId = $routeParams.galleryId;
+    var photosPromise = photodb.photos(galleryId);
+    var n = 8;
+    var firstBatchLoaded = photosPromise.then(function(allImages) {
+        $scope.images = allImages.slice(0, n);
+        return allImages;
+    });
+    $scope.loadMore = function() {
+        firstBatchLoaded.then(function(allImages) {            
+            var last = $scope.images.length;
+            for(var i = 0; i < n && last + i < allImages.length; i++) {
+              $scope.images.push(allImages[last + i]);
+            }
+        });
+    };
+    $scope.galleryId = encodeURIComponent(encodeURIComponent(galleryId));
 }]);
 
 photogallery.controller('GalleryZoomCtrl', ['$scope', 'photodb', '$routeParams', function ($scope, photodb, $routeParams) {

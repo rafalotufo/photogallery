@@ -1,7 +1,9 @@
-<div ng-switch on="photo.type" class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat="photo in images">
-    <a ng-switch-when="image" href="#/gallery-zoom/{{galleryId}}/{{photo.index}}" class="thumbnail">
-    		<img ng-src="/galleries/{{photo.gallery_id}}/thumbnails/{{photo.path}}" align="middle" zoomable/>
-    </a>
+<div infinite-scroll='loadMore()' infinite-scroll-distance='1' infinite-scroll-immediate-check='true' class="row">
+	<div ng-switch on="photo.type" class="col-lg-3 col-md-3 col-sm-4 col-xs-6" ng-repeat="photo in images">
+	    <a ng-switch-when="image" href="#/gallery-zoom/{{galleryId}}/{{photo.index}}" class="thumbnail">
+			<img ng-src="/galleries/{{photo.gallery_id}}/thumbnails/{{photo.path}}" align="middle" zoomable/>
+	    </a>
+	</div>
 </div>
 
 <!-- <ul class="gallery">
